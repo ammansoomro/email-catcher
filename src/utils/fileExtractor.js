@@ -1,11 +1,12 @@
-import path from "path";
-import fs from "fs";
-import textract from "textract";
-import csvParser from "csv-parser";
-import * as XLSX from "xlsx";
+const path = require("path");
+const fs = require("fs");
+const textract = require("textract");
+const csvParser = require("csv-parser");
+const XLSX = require("xlsx");
 
-export async function extractDataFromFilePath(filePath) {
-  const ext = path.extname(filePath).toLowerCase();
+async function extractDataFromFolder(folderName) {
+  const folderPath = path.join(__dirname, "../../emails", folderName);
+  const extractedTexts = [];
 
   const extractTextFile = (filePath) =>
     new Promise((resolve, reject) =>
@@ -15,7 +16,6 @@ export async function extractDataFromFilePath(filePath) {
       })
     );
 
-  // NEW — move inside the function
   const extractPDF = async (filePath) => {
     const pdfParse = (await import("pdf-parse")).default;
     const dataBuffer = fs.readFileSync(filePath);
@@ -40,18 +40,53 @@ export async function extractDataFromFilePath(filePath) {
         .on("error", (err) => reject(err));
     });
 
-  switch (ext) {
-    case ".doc":
-    case ".docx":
-    case ".txt":
-      return await extractTextFile(filePath);
-    case ".pdf":
-      return await extractPDF(filePath);
-    case ".xlsx":
-      return extractXLSX(filePath);
-    case ".csv":
-      return await extractCSV(filePath);
-    default:
-      return "Unsupported file type for extraction.";
+  const ignoreFiles = ["message.txt"];
+  const imageExtensions = [".png", ".jpg", ".jpeg", ".gif", ".webp"];
+
+  const files = fs.readdirSync(folderPath);
+  for (const file of files) {
+    const filePath = path.join(folderPath, file);
+    const ext = path.extname(file).toLowerCase();
+
+    if (ignoreFiles.includes(file) || imageExtensions.includes(ext)) continue;
+
+    try {
+      let extracted;
+      switch (ext) {
+        case ".doc":
+        case ".docx":
+        case ".txt":
+          extracted = await extractTextFile(filePath);
+          break;
+        case ".pdf":
+          extracted = await extractPDF(filePath);
+          break;
+        case ".xlsx":
+          extracted = extractXLSX(filePath);
+          break;
+        case ".csv":
+          extracted = await extractCSV(filePath);
+          break;
+        default:
+          extracted = `Unsupported file type: ${file}`;
+      }
+
+      extractedTexts.push(
+        `\n===== Extracted from: ${file} =====\n${extracted}`
+      );
+    } catch (err) {
+      extractedTexts.push(
+        `\n===== Error reading ${file}: ${err.message} =====`
+      );
+    }
   }
+
+  const finalOutput = `Data From Attachments of the Email:\n\n${extractedTexts.join(
+    "\n"
+  )}`;
+  const outputPath = path.join(folderPath, "extractedData.txt");
+  fs.writeFileSync(outputPath, finalOutput);
+  console.log(`✅ Extracted data saved to ${outputPath}`);
 }
+
+module.exports = extractDataFromFolder;

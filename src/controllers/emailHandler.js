@@ -1,15 +1,17 @@
 const express = require("express");
 const router = express.Router();
 const saveEmailToFolder = require("../utils/emailSaver");
+const extractDataFromFilePath = require("../utils/fileExtractor");
 const generateWithClaude = require("../services/aiService");
 
 router.post("/", async (req, res) => {
   try {
     const parsedData = parseRequestData(req.body);
-    const { emailText, folderName } = saveEmailToFolder(parsedData, req.files);
+    const { folderName } = saveEmailToFolder(parsedData, req.files);
 
-    if (emailText && folderName) {
-      await generateWithClaude(emailText, folderName);
+    if (folderName) {
+      extractDataFromFilePath(folderName);
+      // await generateWithClaude(emailText, folderName);
     }
 
     res.status(200).send("Webhook received and processed");
