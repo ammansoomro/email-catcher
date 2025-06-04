@@ -6,10 +6,10 @@ const generateWithClaude = require("../services/aiService");
 router.post("/", async (req, res) => {
   try {
     const parsedData = parseRequestData(req.body);
-    const emailText = saveEmailToFolder(parsedData, req.files);
+    const { emailText, folderName } = saveEmailToFolder(parsedData, req.files);
 
-    if (emailText) {
-      await generateWithClaude(emailText);
+    if (emailText && folderName) {
+      await generateWithClaude(emailText, folderName);
     }
 
     res.status(200).send("Webhook received and processed");

@@ -13,8 +13,12 @@
     "@openrouter/ai-sdk-provider": "^0.7.0",
     "ai": "^4.3.16",
     "busboy": "^1.6.0",
+    "csv-parser": "^3.2.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
-    "multer": "^2.0.0"
+    "multer": "^2.0.0",
+    "pdf-parse": "^1.1.1",
+    "textract": "^2.5.0",
+    "xlsx": "^0.18.5"
   }
 }

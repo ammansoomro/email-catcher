@@ -31,10 +31,17 @@ function saveEmailToFolder(parsedData, attachments = []) {
     console.log(
       `Saved email to ${recipientSafe} with ${attachments.length} attachment(s).`
     );
-    return emailText;
+
+    return {
+      emailText,
+      folderName: recipientSafe,
+    };
   } catch (err) {
     console.error("Error saving email to folder:", err);
-    return null;
+    return {
+      emailText: null,
+      folderName: null,
+    };
   }
 }
 
