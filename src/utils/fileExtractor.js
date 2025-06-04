@@ -84,9 +84,20 @@ async function extractDataFromFolder(folderName) {
   const finalOutput = `Data From Attachments of the Email:\n\n${extractedTexts.join(
     "\n"
   )}`;
-  const outputPath = path.join(folderPath, "extractedData.txt");
-  fs.writeFileSync(outputPath, finalOutput);
-  console.log(`✅ Extracted data saved to ${outputPath}`);
+  const extractedFilePath = path.join(folderPath, "extractedData.txt");
+  const messageFilePath = path.join(folderPath, "message.txt");
+
+  // Save extracted data
+  fs.writeFileSync(extractedFilePath, finalOutput);
+
+  // Append to message.txt
+  fs.appendFileSync(messageFilePath, `\n\n\n${finalOutput}`);
+
+  // Read final message.txt
+  const combinedMessage = fs.readFileSync(messageFilePath, "utf-8");
+
+  console.log(`✅ Final message composed at ${messageFilePath}`);
+  return combinedMessage;
 }
 
 module.exports = extractDataFromFolder;

@@ -67,7 +67,7 @@ Use "null" or "not found" if data is missing. Output JSON inside <response> tags
 
     fs.writeFileSync(filePath, JSON.stringify({ text }, null, 2));
 
-    console.log('Order Details Saved');
+    console.log("Order Details Saved", text);
     return text;
   } catch (error) {
     console.error("Error generating text with Claude:", error);

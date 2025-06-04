@@ -10,8 +10,9 @@ router.post("/", async (req, res) => {
     const { folderName } = saveEmailToFolder(parsedData, req.files);
 
     if (folderName) {
-      extractDataFromFilePath(folderName);
-      // await generateWithClaude(emailText, folderName);
+      const emailText = await extractDataFromFilePath(folderName);
+      console.log("EMAIL TEXT", emailText);
+      await generateWithClaude(emailText, folderName);
     }
 
     res.status(200).send("Webhook received and processed");
